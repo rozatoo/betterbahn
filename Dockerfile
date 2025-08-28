@@ -66,18 +66,21 @@ RUN apk add --no-cache \
     libxscrnsaver \
     libxtst \
     xdg-utils \
-    wget \
+    curl \
     chromium \
     tzdata && rm -rf /var/cache/apk/*
 
 ENV NODE_ENV=production
 ENV USE_CHROMIUM_PATH=true
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 
 # Kopieren des Standalone-Outputs aus der Builder-Stufe
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 # Kopiert manuell das Modul, dessen Datendateien vom 'standalone'-Modus nicht erfasst werden.
 COPY --from=builder /app/node_modules/db-hafas-stations ./node_modules/db-hafas-stations
@@ -87,6 +90,6 @@ USER node
 
 # Expose port and add healthcheck
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:3000 || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -4 -f http://localhost:3000 || exit 1
 
 CMD ["node", "server.js"]

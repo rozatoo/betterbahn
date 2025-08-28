@@ -1,17 +1,43 @@
 "use client";
 // Importiere Next.js Link-Komponente und React-Hooks
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Navigationsleiste-Komponente
 export const Navbar = () => {
 	// State für mobiles Menü (geöffnet/geschlossen)
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	// Theme-Zustand (light/dark)
+	const [theme, setTheme] = useState("system");
 
-	// Funktion zum Umschalten des mobilen Menüs
-	const toggleMobileMenu = () => {
-		setIsMobileMenuOpen(!isMobileMenuOpen);
+	// Lade gespeichertes Theme oder Systempräferenz
+	useEffect(() => {
+		try {
+			const stored = localStorage.getItem("betterbahn/theme");
+			if (stored === "light" || stored === "dark") {
+				setTheme(stored);
+				document.documentElement.setAttribute("data-theme", stored);
+				return;
+			}
+			// Fallback: Systempräferenz
+			const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+			const initial = prefersDark ? "dark" : "light";
+			setTheme(initial);
+			document.documentElement.setAttribute("data-theme", initial);
+		} catch {}
+	}, []);
+
+	const toggleMobileMenu = () => setIsMobileMenuOpen((v) => !v);
+
+	const toggleTheme = () => {
+		const next = theme === "dark" ? "light" : "dark";
+		setTheme(next);
+		try {
+			localStorage.setItem("betterbahn/theme", next);
+		} catch {}
+		document.documentElement.setAttribute("data-theme", next);
 	};
+
 	return (
 		<header className="relative mb-12 ">
 			<nav
@@ -29,27 +55,42 @@ export const Navbar = () => {
 					</Link>
 				</div>
 
-				{/* Mobile Menü Button */}
-				<button
-					onClick={toggleMobileMenu}
-					className="md:hidden p-2 rounded-md text-primary hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-					aria-expanded={isMobileMenuOpen}
-					aria-controls="mobile-menu"
-					aria-label="Navigation menu"
-				>
-					<span className="sr-only">
-						{isMobileMenuOpen ? "Close menu" : "Open menu"}
-					</span>
-					{/* Hamburger Icon */}
-					<svg
-						className="h-6 w-6"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
+				<div className="flex items-center gap-1">
+					<button
+						onClick={toggleTheme}
+						className="inline-flex items-center justify-center p-1 rounded-md text-primary hover:text-gray-700 focus:outline-none"
+						aria-label="Theme wechseln"
+						aria-pressed={theme === "dark"}
+						title={theme === "dark" ? "Lichtmodus aktivieren" : "Dunkelmodus aktivieren"}
 					>
-						{isMobileMenuOpen ? (
-							/* X Icon für Schließen */
+						{theme === "dark" ? (
+							<span className="icon icon-sun" aria-hidden="true"></span>
+						) : (
+							<span className="icon icon-moon" aria-hidden="true"></span>
+						)}
+					</button>
+
+					{/* Mobile Menü Button */}
+					<button
+						onClick={toggleMobileMenu}
+						className="md:hidden p-2 rounded-md text-primary hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+						aria-expanded={isMobileMenuOpen}
+						aria-controls="mobile-menu"
+						aria-label="Navigation menu"
+					>
+						<span className="sr-only">
+							{isMobileMenuOpen ? "Close menu" : "Open menu"}
+						</span>
+						{/* Hamburger Icon */}
+						<svg
+							className="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
+						>
+							{isMobileMenuOpen ? (
+								/* X Icon für Schließen */
 							<>
 								<path
 									strokeLinecap="round"
@@ -58,8 +99,8 @@ export const Navbar = () => {
 									d="M6 18L18 6M6 6l12 12"
 								/>
 							</>
-						) : (
-							/* Hamburger Icon */
+							) : (
+								/* Hamburger Icon */
 							<>
 								<path
 									strokeLinecap="round"
@@ -68,9 +109,10 @@ export const Navbar = () => {
 									d="M4 6h16M4 12h16M4 18h16"
 								/>
 							</>
-						)}
-					</svg>
-				</button>
+							)}
+						</svg>
+					</button>
+				</div>
 
 				{/* Mobile Navigation Menu */}
 				{/* Overlay */}

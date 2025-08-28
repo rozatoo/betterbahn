@@ -12,6 +12,19 @@ This is not an official repository or project of Deutsche Bahn AG. It is an inde
 
 ## Getting Started
 
+## Selfhosting
+
+Run the published image from GitHub Container Registry:
+
+```
+docker run -d \
+  --name betterbahn \
+  -p 3000:3000 \
+  ghcr.io/rozatoo/betterbahn:latest
+```
+
+## Development
+
 To run the project locally:
 
 1. Clone the repository

@@ -33,3 +33,23 @@ body {
 		--primary: #7fa497;
 	}
 }
+
+:root[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #34423d;
+}
+
+:root[data-theme="dark"] {
+  --background: #171717;
+  --foreground: #ffffff;
+  --primary: #7fa497;
+}
+
+.theme-icon { filter: var(--icon-filter, none); transition: filter 0.2s ease; }
+:root[data-theme="light"] { --icon-filter: none; }
+:root[data-theme="dark"] { --icon-filter: invert(1); }
+
+.icon { display:inline-block; width: 1rem; height: 1rem; background-color: currentColor; }
+.icon-sun { mask: url('/icons/sun.svg') no-repeat center / contain; -webkit-mask: url('/icons/sun.svg') no-repeat center / contain; }
+.icon-moon { mask: url('/icons/moon.svg') no-repeat center / contain; -webkit-mask: url('/icons/moon.svg') no-repeat center / contain; }
